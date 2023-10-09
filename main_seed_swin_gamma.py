@@ -32,7 +32,7 @@ def eval_test(model, x, y):
     :param model:
     :param x:
     :param y:
-    :return: 返回test的acc, 混淆矩阵， f1， kappa
+    :return: Return acc, confusion matrix, f1, kappa for test
     """
     data_set = TensorDataset(x, y)
     data_loader = DataLoader(dataset=data_set, batch_size=x.shape[0], shuffle=True)
@@ -46,7 +46,7 @@ def eval_test(model, x, y):
             pred = pred.cpu().detach().numpy()
             lab = lab.cpu().detach().numpy()
             acc = accuracy_score(pred, lab)  # acc
-            conMat = confusion_matrix(pred, lab)  # 混淆矩阵
+            conMat = confusion_matrix(pred, lab)  # confusion matrix
             f = f1_score(pred, lab, average=None)[0]  # f1
             # kappa
             axis1 = np.sum(conMat, axis=1)
@@ -69,7 +69,7 @@ for ind in range(1,16):
         lab = np.load('./data_input/input_4/label_{}.npy'.format(ind)).reshape([3, 15 * 57])
         lab = lab + 1
         print(fea.shape, lab.shape)
-        tmp_fea = fea[jnd]  # (855,4,32,32)  gamma频段
+        tmp_fea = fea[jnd]  # (855,4,32,32)  gamma
         tmp_lab = lab[jnd]  # (855)
         print(tmp_fea.shape, tmp_lab.shape)
 
@@ -82,12 +82,12 @@ for ind in range(1,16):
         y_test_lab = torch.tensor(y_test, dtype=torch.long)
 
         model = SwinTransformer(
-            # 模型参数
+            # Model parameter
             img_size=32,
             patch_size=4,
             in_chans=4, num_classes=3,
             embed_dim=96,
-            depths=[2, 2, 6, 2],  # 层数
+            depths=[2, 2, 6, 2],  # Number of floors
             num_heads=[3, 6, 12, 24],
             window_size=2,
             mlp_ratio=4., qkv_bias=True,
@@ -140,9 +140,9 @@ for ind in range(1,16):
 accsum = np.zeros([15])
 for human in range(1,16):
     for i in range(3):
-        print("第{}人的第{}次实验acc为：{}".format(human,i+1,score[human-1,i]))
+        print("The {} person's {} experiment acc is: {}".format(human,i+1,score[human-1,i]))
         accsum[human-1] = accsum[human-1] + score[human-1,i]
-    print("------------第{}人的3次实验平均acc为{}-------------------".format(human,accsum[human-1]/3))
+    print("------------The average acc of the 3 experiments of {} person is {}-------------------".format(human,accsum[human-1]/3))
 
 print(np.mean(np.mean(score, axis=0)))
 
