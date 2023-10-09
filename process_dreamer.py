@@ -21,7 +21,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = lfilter(b, a, data)
     return y
 
-def data_1Dto2D(data, Y=9, X=9):  # 9*9的网络拓扑
+def data_1Dto2D(data, Y=9, X=9):  # 9 x 9 network topology
     data_2D = np.zeros([Y, X])
     data_2D[0] = (0, 0, 0, 0, 0, 0, 0, 0, 0)
     data_2D[1] = (0, 0, 0, data[0], 0, data[1], 0, 0, 0)
@@ -49,7 +49,7 @@ label_Valence=np.zeros([23,18])
 label_Arousal=np.zeros([23,18])
 label_Dominance=np.zeros([23,18])
 
-sig = np.zeros([23, 18,58,14, 512])  # 61s，然后4秒为窗口128*4=512，分为58段。
+sig = np.zeros([23, 18,58,14, 512])  # 61s, then 4 seconds for the window 128*4=512, divided into 58 segments.
 lab_v = np.zeros([23, 18,58])
 lab_a = np.zeros([23, 18,58])
 lab_d = np.zeros([23, 18,58])
@@ -90,14 +90,14 @@ for i in range(23):
 
 
 
-res_band = np.zeros([23, 18,58, 14, 512])    #gamma频段滤波
+res_band = np.zeros([23, 18,58, 14, 512])    #Gamma-band filtering
 for j in range(23):
     for k in range(18):
         for v in range(58):
             for m in range(14):
                 res_band[j, k,v, m] = butter_bandpass_filter(sig[j,k, v, m], 31, 50, 128)
 
-entropy = np.zeros([ 23, 18,58, 14, 4])       #这个是切分为4个时间段，每秒计算一次微分熵，但还没有进行拓扑映射的
+entropy = np.zeros([ 23, 18,58, 14, 4])       #This one is divided into four time periods, calculates differential entropy once per second, but has not been topologically mapped
 for m in range(23):
     for k in range(18):
         for n in range(58):
@@ -105,7 +105,7 @@ for m in range(23):
                 for v in range(4):
                     entropy[ m,k, n, o, v] = calculate_differential_entropy(res_band[m, k,n, o,v * 128:(v + 1) * 128])
 
-fea = np.zeros([ 23,18, 58, 4, 32, 32])       #进行拓扑映射并插值的
+fea = np.zeros([ 23,18, 58, 4, 32, 32])       #Topology mapping and interpolation
 for m in range(23):
     for h in range(18):
         for v in range(58):
