@@ -16,7 +16,7 @@ def read_data(num):
     """
     :return: res: data, lab: label
     """
-    res = []  # 每一个人3个session，每个session包含15次实验，每个实验取57个时间段  (3, 15, 57, 62, 800)
+    res = []  # Each person has 3 sessions, each session contains 15 experiments, and each experiment takes 57 time periods (3, 15, 57, 62, 800).
     l = []  # (3, 15, 57)
     files = os.listdir('./data_input/dataset')
     label = scipy.io.loadmat('./data_input/label/label.mat')['label'][0]
@@ -26,7 +26,7 @@ def read_data(num):
 
         number = int(file.split('_')[0])
         if number == num:
-            sig = np.zeros([15, 57, 62, 800])  #  取4分钟中间的1分钟，然后4秒为窗口200*4=800，分为57段。
+            sig = np.zeros([15, 57, 62, 800])  #  Take 1 minute in the middle of 4 minutes, and then 4 seconds as the window 200*4=800, divided into 57 segments.
             lab = np.zeros([15, 57])
             data_mat = scipy.io.loadmat('./data_input/dataset/' + file)
             del data_mat['__header__']
@@ -42,7 +42,7 @@ def read_data(num):
     return res, l
 
 
-def data_1Dto2D(data, Y=9, X=9):  # 9*9的网络拓扑
+def data_1Dto2D(data, Y=9, X=9):  # 9 x 9 network topology
     data_2D = np.zeros([Y, X])
     data_2D[0] = (0, 0, 0, data[0], data[1], data[2], 0, 0, 0)
     data_2D[1] = (0, 0, 0, data[3], 0, data[4], 0, 0, 0)
@@ -83,7 +83,7 @@ def read(num):
         lab[j] = label[j]
 
 
-    res_band = np.zeros([3, 15, 57, 62, 800])    #gamma频段滤波
+    res_band = np.zeros([3, 15, 57, 62, 800])    #Gamma-band filtering
     for j in range(3):
         for v in range(15):
             for m in range(57):
@@ -92,7 +92,7 @@ def read(num):
 
 
 
-    entropy = np.zeros([ 3, 15, 57, 62, 4])       #这个是切分为4个时间段，每秒计算一次微分熵，但还没有进行拓扑映射的
+    entropy = np.zeros([ 3, 15, 57, 62, 4])       #This one is divided into four time periods, calculates differential entropy once per second, but has not been topologically mapped
     for m in range(3):
         for n in range(15):
             for o in range(57):
@@ -101,26 +101,23 @@ def read(num):
                         entropy[ m, n, o, k, v] = calculate_differential_entropy(res_band[m, n, o, k, v * 200:(v + 1) * 200])
 
 
-    fea = np.zeros([ 3, 15, 57, 4, 32, 32])       #进行拓扑映射并插值的
+    fea = np.zeros([ 3, 15, 57, 4, 32, 32])       #Topology mapping and interpolation
     for m in range(3):
         for n in range(15):
             for v in range(57):
                 for k in range(4):
                     mapped = data_1Dto2D(entropy[ m, n, v, :, k])
                     interp = interpolate.interp2d(np.linspace(0, 8, 9), np.linspace(0, 8, 9), mapped, kind='cubic')
-                    x2 = np.linspace(0, 8, 32)  # 指定间隔内生成等间距的数字
+                    x2 = np.linspace(0, 8, 32)  # A number of equally spaced numbers is generated within the specified interval
                     y2 = np.linspace(0, 8, 32)
                     Z2 = interp(x2, y2)
                     fea[m, n, v, k, :, :] = Z2
-                    # plt.imshow(mapped)
-                    # plt.show()
-                    # fea[m, n, v, k, :, :] = mapped
 
     print('\n ########## save ############')
 
 
-    np.save('./data_input/seed_map/cnn_fea_map_{}.npy'.format(num), fea)  # (3,15,57,4,32,32)
-    np.save('./data_input/seed_map/label_{}.npy'.format(num), lab)  #  (3,15,57)
+    np.save('./data_input/input_4/cnn_fea_map_{}.npy'.format(num), fea)  # (3,15,57,4,32,32)
+    np.save('./data_input/input_4/label_{}.npy'.format(num), lab)  #  (3,15,57)
 
 
 for i in tqdm(range(1, 16)):
