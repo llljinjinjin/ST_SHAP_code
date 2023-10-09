@@ -33,7 +33,7 @@ def eval_test(model, x, y):
     :param model:
     :param x:
     :param y:
-    :return: 返回test的acc, 混淆矩阵， f1， kappa
+    :return: Return acc, confusion matrix, f1, kappa for test
     """
     data_set = TensorDataset(x, y)
     data_loader = DataLoader(dataset=data_set, batch_size=x.shape[0], shuffle=True)
@@ -51,7 +51,7 @@ def eval_test(model, x, y):
                 if lab[l]==0:
                     count=count+1
             acc = accuracy_score(pred, lab)  # acc
-            conMat = confusion_matrix(pred, lab)  # 混淆矩阵
+            conMat = confusion_matrix(pred, lab)  # confusion matrix
             f = f1_score(pred, lab, average=None)[0]  # f1
             # kappa
             axis1 = np.sum(conMat, axis=1)
@@ -66,14 +66,14 @@ def eval_test(model, x, y):
 
 def Split_Sets_10_Fold(total_fold, data):
     """
-    :total_fold是你设定的几折，我这里之后带实参带10就行，data就是我需要划分的数据
-    :train_index,test_index用来存储train和test的index（索引）
+    :total_fold is the number of folds you set. I will take 10 with the argument here. data is the data I need to divide
+    :train_index,test_index The index used to store train and test.
 
     """
     train_index = []
     test_index = []
     kf = KFold(n_splits=total_fold, shuffle=True, random_state=True)
-    #这里设置shuffle设置为ture就是打乱顺序在分配
+    #Here set shuffle set to ture is to shuffle the order in the allocation
     for train_i, test_i in kf.split(data):
         train_index.append(train_i)
         test_index.append(test_i)
@@ -91,7 +91,7 @@ lab_d = np.load('./data_input/dreamer_all/label_d.npy').reshape([23,18*58])
 lab_v = np.load('./data_input/dreamer_all/label_v.npy').reshape([23,18*58])
 print(fea.shape, lab_a.shape,lab_d.shape,lab_v.shape)
 for ind in range(23):
-    tmp_fea = fea[ind]  # (1044,4,32,32)  gamma频段
+    tmp_fea = fea[ind]  # (1044,4,32,32)  gamma
     [train_index, test_index] = Split_Sets_10_Fold(total_fold, tmp_fea)
     for shizhe in range(10):
         for biao in range(3):
@@ -103,10 +103,10 @@ for ind in range(23):
                 tmp_lab = lab_v[ind]  # (1044)
             print(tmp_fea.shape, tmp_lab.shape)
 
-            x_train = tmp_fea[train_index[shizhe]]  # 得到训练数据 939,4,32,32
-            x_test = tmp_fea[test_index[shizhe]]  # 得到测试数据  105,4,32,32
-            y_train = tmp_lab[train_index[shizhe]]  # 得到训练标签
-            y_test = tmp_lab[test_index[shizhe]]  # 得到测试标签
+            x_train = tmp_fea[train_index[shizhe]]  # Get training data 939,4,32,32
+            x_test = tmp_fea[test_index[shizhe]]  # Get test data  105,4,32,32
+            y_train = tmp_lab[train_index[shizhe]]  # Get training tag
+            y_test = tmp_lab[test_index[shizhe]]  # Get test tag
 
 
             x_train_fea = torch.tensor(x_train, dtype=torch.float32)
@@ -116,12 +116,12 @@ for ind in range(23):
             y_test_lab = torch.tensor(y_test, dtype=torch.long)
 
             model = SwinTransformer(
-                # 模型参数
+                # Model parameter
                 img_size=32,
                 patch_size=4,
                 in_chans=4, num_classes=2,
                 embed_dim=96,
-                depths=[2, 2, 6, 2],  # 层数
+                depths=[2, 2, 6, 2],  # Number of layers
                 num_heads=[3, 6, 12, 24],
                 window_size=2,
                 mlp_ratio=4., qkv_bias=True, qk_scale=None,
@@ -167,7 +167,7 @@ for ind in range(23):
             f1[ind,shizhe,biao] = f
             k[ind,shizhe,biao] = kappa
             conMat[ind,shizhe,biao] = Mat
-            print("第{}人的第{}次的{}类别实验acc为：{}".format(ind+1,shizhe+1,biao,score[ind,shizhe,biao]))
+            print("The {} category experiment acc of the {} person of the {} time is {}".format(biao,ind+1,shizhe+1,score[ind,shizhe,biao]))
             torch.save(model, './model/dreamer/onlyswin_gamma_' + str(ind)+'_'+ str(shizhe)+'_'+str(biao)+ '.pth')
 
     np.save(f'./result/dreamer/acc{ind}.npy', score[ind])
@@ -180,20 +180,20 @@ for human in range(23):
     for sz in range(10):
         for zhi in range(3):
             if zhi == 0:
-                print("第{}人的第{}次AROUSAL实验acc为：{}".format(human + 1, sz + 1, score[sz, human, 0]))
+                print("The {} person's {} AROUSAL experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 0]))
                 accsum[0, human, sz] = accsum[0, human, sz] + score[sz, human, 0]
             elif zhi == 1:
-                print("第{}人的第{}次DOMINANCE实验acc为：{}".format(human + 1, sz + 1, score[sz, human, 1]))
+                print("The {} person's {} DOMINANCE experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 1]))
                 accsum[1, human, sz] = accsum[1, human, sz] + score[sz, human, 1]
             else:
-                print("第{}人的第{}次VALANCE实验acc为：{}".format(human + 1, sz + 1, score[sz, human, 2]))
+                print("The {} person's {} VALANCE experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 2]))
                 accsum[2, human, sz] = accsum[2, human, sz] + score[sz, human, 2]
 
 
-print("_____________________________________________________平均十折____________________________________________________________")
-print("平均Arousal：{}".format(np.mean(np.mean(accsum[0], axis=0))))
-print("平均Dominance：{}".format(np.mean(np.mean(accsum[1], axis=0))))
-print("平均Valance：{}".format(np.mean(np.mean(accsum[2], axis=0))))
+print("_____________________________________________________Ten percent off____________________________________________________________")
+print("average Arousal：{}".format(np.mean(np.mean(accsum[0], axis=0))))
+print("average Dominance：{}".format(np.mean(np.mean(accsum[1], axis=0))))
+print("average Valance：{}".format(np.mean(np.mean(accsum[2], axis=0))))
 
 
 
