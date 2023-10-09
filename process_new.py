@@ -11,7 +11,7 @@ import seaborn as sns
 import mne
 from matplotlib import pyplot as plt
 from einops import rearrange, repeat, reduce
-# 读取数据
+# Read data
 def read_data(num):
     """
     :return: res: data, lab: label
