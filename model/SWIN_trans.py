@@ -419,7 +419,7 @@ class BasicLayer(nn.Module):
         self.depth = depth
         self.window_size = window_size
         self.use_checkpoint = use_checkpoint
-        self.shift_size = window_size // 2  # 移动尺寸
+        self.shift_size = window_size // 2  
 
         # All blocks in the current stage
         # depth is the number of blocks in this stage, and downsample means patch merging
@@ -566,7 +566,7 @@ class SwinTransformer(nn.Module):
 
         self.apply(self._init_weights)
 
-    # 权重初始化函数
+    # Weight initialization function
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
             nn.init.trunc_normal_(m.weight, std=.02)
@@ -581,7 +581,7 @@ class SwinTransformer(nn.Module):
         x, H, W = self.patch_embed(x)
         x = self.pos_drop(x)
 
-        # 依次通过每个stage
+        # Go through each stage in turn
         for layer in self.layers:
             x, H, W = layer(x, H, W)
 
