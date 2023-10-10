@@ -39,13 +39,13 @@ To pre-trained SEED, run:
 ```
 process_new.py
 ```
-Save the preprocessed data to `./data_input/input_4`.  
+Save the preprocessed data to `data_input/input_4`.  
   
 To pre-training DREAMER, run:
 ```
 process_dreamer.py
 ```
-Save the preprocessed data to `./data_input/dreamer_all`.
+Save the preprocessed data to `data_input/dreamer_all`.
 
 ## Results
 The classification results for our method and other competing methods are as follows:
