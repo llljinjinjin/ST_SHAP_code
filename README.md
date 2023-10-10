@@ -13,16 +13,20 @@ In the figure above (a), the original EEG signal is preprocessed, then topologic
 ## Instructions
 ### Install the dependencies
 It is recommended to create a virtual environment with python version 3.7 and activate it before running the following:
-  pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
+
 ### Obtain the raw dataset
 Download the raw dataset from the [resources](##Resources) above, and save them to the same folder.  Please download the SEED/DREAMER data in mat file format.
+
 ### Pre-process the raw dataset
 To pre-trained SEED, run:
 ```
 process_new.py
 ```
 Save the preprocessed data to `./data_input/input_4`.  
-
+  
 To pre-training DREAMER, run:
 ```
 process_dreamer.py
