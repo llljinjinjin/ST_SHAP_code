@@ -65,8 +65,8 @@ conMat = np.zeros([15, 3, 3, 3])
 
 for ind in range(1,16):
     for jnd in range(3):
-        fea = np.load('./data_input/input_4/cnn_fea_map_{}.npy'.format(ind)).reshape([ 3, 15 * 57, 4, 32, 32])
-        lab = np.load('./data_input/input_4/label_{}.npy'.format(ind)).reshape([3, 15 * 57])
+        fea = np.load('../../data_input/input_4/cnn_fea_map_{}.npy'.format(ind)).reshape([ 3, 15 * 57, 4, 32, 32])
+        lab = np.load('../../data_input/input_4/label_{}.npy'.format(ind)).reshape([3, 15 * 57])
         lab = lab + 1
         print(fea.shape, lab.shape)
         tmp_fea = fea[jnd]  # (855,4,32,32)  gamma
@@ -133,7 +133,7 @@ for ind in range(1,16):
         f1[ind - 1, jnd] = f
         k[ind - 1, jnd] = kappa
         conMat[ind - 1, jnd] = Mat
-    torch.save(model, './model/seed/onlyswin_gamma_' + str(ind)+'_'+ str(jnd)+ '.pth')
+    torch.save(model, '../../model/seed/onlyswin_gamma_' + str(ind)+'_'+ str(jnd)+ '.pth')
 
 
 
@@ -146,8 +146,8 @@ for human in range(1,16):
 
 print(np.mean(np.mean(score, axis=0)))
 
-np.save('./result/acc.npy', score)
-np.save('./result/f1.npy', f1)
-np.save('./result/kappa.npy', k)
-np.save('./result/conMat.npy', conMat)
+np.save('../../result/seed/acc.npy', score)
+np.save('../../result/seed/f1.npy', f1)
+np.save('../../result/seed/kappa.npy', k)
+np.save('../../result/seed/conMat.npy', conMat)
 
