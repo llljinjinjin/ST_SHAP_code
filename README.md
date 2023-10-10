@@ -35,11 +35,14 @@ Save the preprocessed data to `./data_input/dreamer_all`.
 
 ## Results
 The classification results for our method and other competing methods are as follows:
+![](https://github.com/llljinjinjin/ST_SHAP_code/blob/main/result.png)
 
+## Cite:
+If you find this architecture or toolbox useful then please cite this paper:
+ST-SHAP:A novel explainable attention network for EEG-based emotion recognition
 
-
-
-
+## References:
+ST-SHAP:A novel explainable attention network for EEG-based emotion recognition
 
 
 
