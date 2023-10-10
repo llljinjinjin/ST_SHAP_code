@@ -11,7 +11,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # load the models
-model = torch.load('./model/seed/onlyswin_1.pth')
+model = torch.load('./model/seed/onlyswin_gamma_1.pth')
 
 # Load data set
 X= np.zeros([3, 342, 4, 32, 32])
