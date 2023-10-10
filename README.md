@@ -18,7 +18,21 @@ pip install -r requirements.txt
 ```
 
 ### Obtain the raw dataset
-Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED/DREAMER data in mat file format.
+- [ ] Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED/DREAMER data in mat file format.
+- [ ] Organize the raw data file into the following file structure:
+```
+ DatasetDir/dataset
+                -/1_20131027.mat
+                -/1_20131030.mat
+                -/1_20131107.mat
+                -/2_20140404.mat
+                /...
+          -/label
+                -/label.mat
+                .
+          -/DREAMER.mat          
+```
+Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively. For the DREAMER file, it contains the data and labels for that dataset.
 
 ### Pre-process the raw dataset
 To pre-trained SEED, run:
