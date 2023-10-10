@@ -17,12 +17,14 @@ It is recommended to create a virtual environment with python version 3.7 and ac
 ### Obtain the raw dataset
 Download the raw dataset from the [resources](##Resources) above, and save them to the same folder.  Please download the SEED/DREAMER data in mat file format.
 ### Pre-process the raw dataset
-Pre-trained SEED, run:
+To pre-trained SEED, run:
 ```
 process_new.py
 ```
 Save the preprocessed data to `./data_input/input_4`.  
 
-Pre-training DREAMER, run:  
-    process_dreamer.py  
+To pre-training DREAMER, run:
+```
+process_dreamer.py
+```
 Save the preprocessed data to `./data_input/dreamer_all`.
