@@ -28,7 +28,7 @@ def read_data(num):
         if number == num:
             sig = np.zeros([15, 57, 62, 800])  #  Take 1 minute in the middle of 4 minutes, and then 4 seconds as the window 200*4=800, divided into 57 segments.
             lab = np.zeros([15, 57])
-            data_mat = scipy.io.loadmat('./data_input/dataset/' + file)
+            data_mat = scipy.io.loadmat('../../data_input/dataset/' + file)
             del data_mat['__header__']
             del data_mat['__version__']
             del data_mat['__globals__']
@@ -116,8 +116,8 @@ def read(num):
     print('\n ########## save ############')
 
 
-    np.save('./data_input/input_4/cnn_fea_map_{}.npy'.format(num), fea)  # (3,15,57,4,32,32)
-    np.save('./data_input/input_4/label_{}.npy'.format(num), lab)  #  (3,15,57)
+    np.save('../../data_input/input_4/cnn_fea_map_{}.npy'.format(num), fea)  # (3,15,57,4,32,32)
+    np.save('../../data_input/input_4/label_{}.npy'.format(num), lab)  #  (3,15,57)
 
 
 for i in tqdm(range(1, 16)):
