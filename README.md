@@ -19,8 +19,8 @@ Download the raw dataset from the [resources](##Resources) above, and save them 
 ### Pre-process the raw dataset
 Pre-trained SEED, run:
     process_new.py
-Save the preprocessed data to './data_input/input_4'.
+Save the preprocessed data to `./data_input/input_4`.
 
 Pre-training DREAMER, run:
     process_dreamer.py
-Save the preprocessed data to './data_input/dreamer_all'.
+Save the preprocessed data to `./data_input/dreamer_all`.
