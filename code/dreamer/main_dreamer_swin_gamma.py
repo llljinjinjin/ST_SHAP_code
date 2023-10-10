@@ -86,10 +86,10 @@ conMat = np.zeros([23,10,3, 2, 2])
 best_acc=np.zeros([23,3])
 total_fold = 10
 
-fea = np.load('./data_input/dreamer_all/cnn_fea_map.npy').reshape([23,18*58,4,32,32])  # 23,1044,4,32,32
-lab_a = np.load('./data_input/dreamer_all/label_a.npy').reshape([23,18*58])  # 23,1044
-lab_d = np.load('./data_input/dreamer_all/label_d.npy').reshape([23,18*58])
-lab_v = np.load('./data_input/dreamer_all/label_v.npy').reshape([23,18*58])
+fea = np.load('../../data_input/dreamer_all/cnn_fea_map.npy').reshape([23,18*58,4,32,32])  # 23,1044,4,32,32
+lab_a = np.load('../../data_input/dreamer_all/label_a.npy').reshape([23,18*58])  # 23,1044
+lab_d = np.load('../../data_input/dreamer_all/label_d.npy').reshape([23,18*58])
+lab_v = np.load('../../data_input/dreamer_all/label_v.npy').reshape([23,18*58])
 print(fea.shape, lab_a.shape,lab_d.shape,lab_v.shape)
 for ind in range(23):
     tmp_fea = fea[ind]  # (1044,4,32,32)  gamma
@@ -174,10 +174,10 @@ for ind in range(23):
                 best_acc[ind,biao]=acc
                 torch.save(model, './model/dreamer/onlyswin_gamma_' + str(ind)+'_'+str(biao)+ '.pth')
 
-    np.save(f'./result/dreamer/acc{ind}.npy', score[ind])
-    np.save(f'./result/dreamer/f1{ind}.npy', f1[ind])
-    np.save(f'./result/dreamer/kappa{ind}.npy', k[ind])
-    np.save(f'./result/dreamer/conMat{ind}.npy', conMat[ind])
+    np.save(f'../../result/dreamer/acc{ind}.npy', score[ind])
+    np.save(f'../../result/dreamer/f1{ind}.npy', f1[ind])
+    np.save(f'../../result/dreamer/kappa{ind}.npy', k[ind])
+    np.save(f'../../result/dreamer/conMat{ind}.npy', conMat[ind])
 
 accsum = np.zeros([3, 23, 10])
 for human in range(23):
