@@ -3,7 +3,7 @@ import torch, torchvision
 import shap
 import numpy as np
 from sklearn.model_selection import train_test_split  # Partition data set
-from model.swin_transformer import SwinTransformer
+from model.SWIN_trans import SwinTransformer
 import heapq
 # GradientExplainer Explain the model using the expected gradient (extension of the integrated gradient)
 
