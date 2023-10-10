@@ -83,6 +83,7 @@ score = np.zeros([23,10,3])
 f1 = np.zeros([23,10,3])
 k = np.zeros([23,10,3])
 conMat = np.zeros([23,10,3, 2, 2])
+best_acc=np.zeros([23,3])
 total_fold = 10
 
 fea = np.load('./data_input/dreamer_all/cnn_fea_map.npy').reshape([23,18*58,4,32,32])  # 23,1044,4,32,32
@@ -168,7 +169,10 @@ for ind in range(23):
             k[ind,shizhe,biao] = kappa
             conMat[ind,shizhe,biao] = Mat
             print("The {} category experiment acc of the {} person of the {} time is {}".format(biao,ind+1,shizhe+1,score[ind,shizhe,biao]))
-            torch.save(model, './model/dreamer/onlyswin_gamma_' + str(ind)+'_'+ str(shizhe)+'_'+str(biao)+ '.pth')
+            
+            if(best_acc[ind,biao]<acc):
+                best_acc[ind,biao]=acc
+                torch.save(model, './model/dreamer/onlyswin_gamma_' + str(ind)+'_'+str(biao)+ '.pth')
 
     np.save(f'./result/dreamer/acc{ind}.npy', score[ind])
     np.save(f'./result/dreamer/f1{ind}.npy', f1[ind])
