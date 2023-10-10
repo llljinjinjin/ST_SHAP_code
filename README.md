@@ -7,8 +7,8 @@ This is a PyTorch implementation of the ST-SHAP architecture for emotional EEG c
 In the figure above (a), the original EEG signal is preprocessed, then topologically interpolated according to the electrode distribution location, and emotion recognition is performed by (b) Swin Transformer. Finally, the model decision is explained by (c) SHAP method.
 
 ## Resources
-* SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
-- DREAMER:[LINK](https://ieeexplore.ieee.org/abstract/document/7887697)
+- [ ] SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
+- [ ] DREAMER:[LINK](https://ieeexplore.ieee.org/abstract/document/7887697)
 
 ## Instructions
 ### Install the dependencies
