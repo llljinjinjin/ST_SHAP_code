@@ -38,7 +38,7 @@ def calculate_differential_entropy(data):
     return 0.5 * np.log(2 * np.pi * np.exp(1) * np.var(data) + np.array(1e-5))
 
 
-dreamer = scipy.io.loadmat('./data_input/DREAMER.mat')
+dreamer = scipy.io.loadmat('./././data_input/DREAMER.mat')
 del dreamer['__header__']
 del dreamer['__version__']
 del dreamer['__globals__']
@@ -118,7 +118,7 @@ for m in range(23):
                 fea[ m, h,v, k, :, :] = Z2
 
 print('\n ########## save ############')
-np.save('./data_input/dreamer_all/cnn_fea_map.npy',fea)  # (23,18,58,4,32,32)
-np.save('./data_input/dreamer_all/label_a.npy',lab_a)  #  (23,18,58)
-np.save('./data_input/dreamer_all/label_v.npy',lab_v)  #  (23,18,58)
-np.save('./data_input/dreamer_all/label_d.npy',lab_d)  #  (23,18,58)
+np.save('./././data_input/dreamer_all/cnn_fea_map.npy',fea)  # (23,18,58,4,32,32)
+np.save('./././data_input/dreamer_all/label_a.npy',lab_a)  #  (23,18,58)
+np.save('./././data_input/dreamer_all/label_v.npy',lab_v)  #  (23,18,58)
+np.save('./././data_input/dreamer_all/label_d.npy',lab_d)  #  (23,18,58)
