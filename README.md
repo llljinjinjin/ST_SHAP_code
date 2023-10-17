@@ -8,8 +8,8 @@ In the figure above (a), the original EEG signal is preprocessed, then topologic
 This study is the first to use SwinTransformer as an emotional EEG recognition model to apply concepts from the field of computer vision (CV) to the field of EEG based emotion recognition. The aim is to deeply explore the local and global dependencies in the spatial domain of affective EEG, and to interpret the lead information.
 
 ## Resources
-- [ ] SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
-- [ ] DREAMER:[LINK](https://ieeexplore.ieee.org/abstract/document/7887697)
+* SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
+- DREAMER:[LINK](https://ieeexplore.ieee.org/abstract/document/7887697)
 
 ## Instructions
 ### Install the dependencies
@@ -19,8 +19,8 @@ pip install -r requirements.txt
 ```
 
 ### Obtain the raw dataset
-- [ ] Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED/DREAMER data in mat file format.
-- [ ] Organize the raw data file into the following file structure:
+* Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED/DREAMER data in mat file format.
+- Organize the raw data file into the following file structure:
 ```
  DatasetDir/dataset
                 -/1_20131027.mat
@@ -69,7 +69,20 @@ shap_explain.py
 
 ## Results
 The classification results for our method and other competing methods are as follows:
-![](https://github.com/llljinjinjin/ST_SHAP_code/blob/main/result.png)
+### SEED
+<div align="center">
+| Dataset | Test mode | GSCCA |BiDANN |BiHDM|R2G-STNN|DGCNN|RGNN| SST-EmotionNet|MFBPST-3D-DRLF|ST-SHAP|
+| ---------- | -----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| SEED  | 40% testing, 60% training   | 82.96±9.95  |92.38±7.04|93.12±6.06|93.38±5.96|90.40±8.49|94.24±5.95|96.02±2.17|96.67±2.8|97.18±2.7|
+</div>
+
+### DREAMER
+| Dimension class | Test mode | DT |RJI |SVM|Conti-CNN|DGCNN|Bi-ANN|ST-SHAP|
+| ---------- | -----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| Arousal(%) | Ten cross-validation   | 84.48±5.33  |89.58±4.99|84±4.39|82.48±5.11|88.79±3.86|92.95±2.96|94.09±4.66|
+| Valance(%) | Ten cross-validation  | 84.77±5.44  |89.42±4.94|84.63±4.41|81.72±5.24|88.87±3.58|92.68±3.03|94.20±3.72|
+</div>
+
 
 ## Cite:
 If you find this architecture or toolbox useful then please cite this paper:
