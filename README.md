@@ -55,12 +55,16 @@ For DREAMER, run;
 ```
 main_seed_swin_gamma.py
 ```
-Please save the model files of the corresponding data set respectively in the 'seed' and 'dreamer' files under the 'model' directory, and please unify the format of ***pth***.
+Please save the model files of the corresponding data set respectively in the `seed` and `dreamer` files under the `model` directory, and please unify the format of ***pth***.
 
 ### Model explaining
-For SEED, please load the above model file stored in the 'model/seed' folder and the preprocessed data stored in 'data_input/input_4' respectively, and run:
+For SEED, please load the above model file stored in the `model/seed` folder and the preprocessed data stored in `data_input/input_4` respectively, and run:
 ```
 shap_explain_mean.py
+```
+For DREAMER, please load the above model file saved in the `model/dreamer` folder and the preprocessed data saved in `data_input/dreamer_all` and run:
+```
+shap_explain.py
 ```
 
 ## Results
