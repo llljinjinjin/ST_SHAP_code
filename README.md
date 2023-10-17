@@ -71,12 +71,15 @@ shap_explain.py
 The classification results for our method and other competing methods are as follows:
 ### SEED
 <div align="center">
+ 
 | Dataset | Test mode | GSCCA |BiDANN |BiHDM|R2G-STNN|DGCNN|RGNN| SST-EmotionNet|MFBPST-3D-DRLF|ST-SHAP|
 | ---------- | -----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | SEED  | 40% testing, 60% training   | 82.96±9.95  |92.38±7.04|93.12±6.06|93.38±5.96|90.40±8.49|94.24±5.95|96.02±2.17|96.67±2.8|97.18±2.7|
 </div>
 
 ### DREAMER
+<div align="center">
+ 
 | Dimension class | Test mode | DT |RJI |SVM|Conti-CNN|DGCNN|Bi-ANN|ST-SHAP|
 | ---------- | -----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | Arousal(%) | Ten cross-validation   | 84.48±5.33  |89.58±4.99|84±4.39|82.48±5.11|88.79±3.86|92.95±2.96|94.09±4.66|
