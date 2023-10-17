@@ -36,17 +36,12 @@ pip install -r requirements.txt
 Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively. For the DREAMER file, it contains the data and labels for that dataset.
 
 ### Pre-process the raw dataset
-To pre-trained SEED, run:
+To pre-trained SEED/DREAMER, run:
 ```
 process_new.py
-```
-Save the preprocessed data to `data_input/input_4`.  
-  
-To pre-training DREAMER, run:
-```
 process_dreamer.py
 ```
-Save the preprocessed data to `data_input/dreamer_all`.
+Please create folders `input_4` and `dreamer_all` in the `data_input` directory to store the processed data.  
 
 ## Results
 The classification results for our method and other competing methods are as follows:
