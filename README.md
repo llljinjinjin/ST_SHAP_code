@@ -91,8 +91,14 @@ The classification results for our method and other competing methods are as fol
 If you find this architecture or toolbox useful then please cite this paper:
 ST-SHAP:A novel explainable attention network for EEG-based emotion recognition
 
-## References:
-ST-SHAP:A novel explainable attention network for EEG-based emotion recognition
+## Acknowledgment
+We thank Liu Z et al and Lundberg S M et al for their wonderful works.
+[Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer: Hierarchical vision transformer using shifted windows. In Proceedings of the IEEE/CVF international conference on computer vision, pages 10012–10022, 2021.](https://openaccess.thecvf.com/content/ICCV2021/html/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper)
+
+[Scott M Lundberg and Su-In Lee. A unified approach to interpreting model predictions. Advances in neural information processing
+systems, 30, 2017.](https://proceedings.neurips.cc/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html)
+
+
 
 
 
