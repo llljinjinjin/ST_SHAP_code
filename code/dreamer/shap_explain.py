@@ -12,27 +12,27 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # load the models
-model = torch.load('../../model/dreamer/onlyswin_gamma_21_0.pth')  # 22_0 is the 23rd arousal
+model = torch.load('../../model/dreamer/dreamerSwin_22_0.pth')  # 22_0 is the 23 arousal
 
 # Load data set
-X= np.zeros([105, 4, 32, 32])
-y= np.zeros([105])
-fea = np.load('../../data_input/dreamer_all/cnn_fea_map.npy').reshape([23, 18 * 58, 4, 32, 32])
-lab = np.load('../../data_input/dreamer_all/label_v.npy').reshape([23, 18 * 58])
-tmp_fea=fea[21]  # Take the 22nd person data
-tmp_lab=lab[21]
+X= np.zeros([103, 4, 32, 32])
+y= np.zeros([103])
+fea = np.load('../../data_input/dreamer_all/cnn_fea_map.npy').reshape([23, 18 * 57, 4, 32, 32])
+lab = np.load('../../data_input/dreamer_all/label_v.npy').reshape([23, 18 * 57])
+tmp_fea=fea[22]  # Take the 23 person data
+tmp_lab=lab[22]
 x_train, X_ONE, y_train, y_ONE = train_test_split(tmp_fea, tmp_lab, test_size=0.1, random_state=20)
 print(X_ONE.shape,y_ONE.shape)
-X = torch.tensor(X_ONE, dtype=torch.float32)  # 105,4,32,32
-y = torch.tensor(y_ONE, dtype=torch.float32)  # 105
+X = torch.tensor(X_ONE, dtype=torch.float32)  # 103,4,32,32
+y = torch.tensor(y_ONE, dtype=torch.float32)  # 103
 X, y = X.to(device), y.to(device)
-print(X.shape)  # test(105, 4, 32, 32)
+print(X.shape)  # test(103, 4, 32, 32)
 
 
 # Select the sample you want to interpret
 to_explain = X[:]
 print("label:{}".format(y[:]))
-print(to_explain.shape)  # test(105,4, 32, 32)
+print(to_explain.shape)  # test(103,4, 32, 32)
 
 class_names = {'0': ['LA'], '1': ['HA']}
 
@@ -48,19 +48,19 @@ e = shap.GradientExplainer(model, X)
 # If ranked_outputs is None, then this tensor list matches the number of model outputs. If ranked_outputs is a positive integer that only explains many top-level model outputs, then return a pair (shap_values, indexes).
 # Where shap_values is a list of tensors of length ranked_outputs and index is a matrix of which output indexes are selected as 'top' for each sample
 shap_values, indexes = e.shap_values(to_explain, ranked_outputs=1, nsamples=32)  # The feature parameters are interpreted with an interpreter
-print(shap_values[0].shape)  # (105, 4, 32, 32)
-print(indexes.shape)  # (105, 1)
+print(shap_values[0].shape)  # (103, 4, 32, 32)
+print(indexes.shape)  # (103, 1)
 
 to_explain = np.array(to_explain.cpu())
 
 # plot the explanations swap the 2nd and 3rd dimensions
 shap_values = [np.swapaxes(np.swapaxes(s, 2, 3), 1, -1) for s in shap_values]
-print(shap_values[0].shape)  # (105, 32, 32, 4)
+print(shap_values[0].shape)  # (103, 32, 32, 4)
 
 indexes = np.array(indexes.cpu())
 
 to_explain = to_explain.swapaxes(2, 3).swapaxes(-1, 1)
-print(to_explain.shape)  # (105, 32, 32, 4)
+print(to_explain.shape)  # (103, 32, 32, 4)
 
 # print(np.sum(indexes == 2))
 
