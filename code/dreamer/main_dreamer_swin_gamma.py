@@ -169,7 +169,7 @@ for ind in range(23):
             
             if score[ind,shizhe,biao] >best_model[biao]:
                 best_model[biao]=score[ind,shizhe,biao]
-                torch.save(model, '../../model/model_explain_new/dreamerSwin_' + str(ind) +'_'+str(biao)+ '.pth')
+                torch.save(model, '../../model/dreamer/dreamerSwin_' + str(ind) +'_'+str(biao)+ '.pth')
 
     np.save(f'../../result/dreamer/acc{ind}.npy', score[ind])
     np.save(f'../../result/dreamer/f1{ind}.npy', f1[ind])
