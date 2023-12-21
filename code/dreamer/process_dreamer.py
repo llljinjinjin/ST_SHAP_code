@@ -44,24 +44,26 @@ del dreamer['__version__']
 del dreamer['__globals__']
 dreamer=dreamer['DREAMER']['Data'][0][0][0]
 
-data_eeg=np.zeros([23,18,14,7808])
+data_eeg=np.zeros([23,18,14,7680])
 label_Valence=np.zeros([23,18])
 label_Arousal=np.zeros([23,18])
 label_Dominance=np.zeros([23,18])
 
-sig = np.zeros([23, 18,58,14, 512])  # 61s, then 4 seconds for the window 128*4=512, divided into 58 segments.
-lab_v = np.zeros([23, 18,58])
-lab_a = np.zeros([23, 18,58])
-lab_d = np.zeros([23, 18,58])
+sig = np.zeros([23, 18,57,14, 512])  # 60s, then 4 seconds for the window 128*4=512, divided into 57 segments.
+lab_v = np.zeros([23, 18,57])
+lab_a = np.zeros([23, 18,57])
+lab_d = np.zeros([23, 18,57])
 for i in range(23):
-    tmp_=np.zeros([18,7808,14])
+    tmp_=np.zeros([18,7680,14])
     list_data = dreamer[i][0][0]
-    data_eegtmp=list_data[2][0][0][0]# 18,1
+    data_eegtmp=list_data[2][0][0][1]# 18,1
     label_Valence[i]=list_data[4].reshape([18])  #18
     label_Arousal[i]=list_data[5].reshape([18])  #18
     label_Dominance[i]=list_data[6].reshape([18])  #18
     for film in range(18):
-        tmp_[film]=data_eegtmp[film][0]  #18,7808,14
+        data_tmptmp=data_eegtmp[film][0]
+        data_len=data_tmptmp.shape[0]
+        tmp_[film]=data_tmptmp[data_len-128*60:,:] #18, 7680,14
         if label_Valence[i][film] <= 3:
             label_Valence[i][film] = 0
         elif label_Valence[i][film] >3:
@@ -77,12 +79,12 @@ for i in range(23):
         elif label_Dominance[i][film]>3:
             label_Dominance[i][film]=1
 
-    data_eeg[i] = rearrange(tmp_, 'h w c -> h c w')  # 18,14,7808
+    data_eeg[i] = rearrange(tmp_, 'h w c -> h c w')  # 23,18,14,7680
 
 
-    tmp=data_eeg[i]  #18,14,7808
+    tmp=data_eeg[i]  #18,14,7680
     for f in range(18):
-        for j in range(58):
+        for j in range(57):
             sig[i,f, j] = tmp[f,:, j * 128:(j + 4) * 128]
             lab_v[i,f, j] = label_Valence[i][f]
             lab_a[i,f ,j] = label_Arousal[i][f]
@@ -90,25 +92,25 @@ for i in range(23):
 
 
 
-res_band = np.zeros([23, 18,58, 14, 512])    #Gamma-band filtering
+res_band = np.zeros([23, 18,57, 14, 512])    #Gamma-band filtering
 for j in range(23):
     for k in range(18):
-        for v in range(58):
+        for v in range(57):
             for m in range(14):
                 res_band[j, k,v, m] = butter_bandpass_filter(sig[j,k, v, m], 31, 50, 128)
 
-entropy = np.zeros([ 23, 18,58, 14, 4])       #This one is divided into four time periods, calculates differential entropy once per second, but has not been topologically mapped
+entropy = np.zeros([ 23, 18,57, 14, 4])       #This one is divided into four time periods, calculates differential entropy once per second, but has not been topologically mapped
 for m in range(23):
     for k in range(18):
-        for n in range(58):
+        for n in range(57):
             for o in range(14):
                 for v in range(4):
                     entropy[ m,k, n, o, v] = calculate_differential_entropy(res_band[m, k,n, o,v * 128:(v + 1) * 128])
 
-fea = np.zeros([ 23,18, 58, 4, 32, 32])       #Topology mapping and interpolation
+fea = np.zeros([ 23,18, 57, 4, 32, 32])       #Topology mapping and interpolation
 for m in range(23):
     for h in range(18):
-        for v in range(58):
+        for v in range(57):
             for k in range(4):
                 mapped = data_1Dto2D(entropy[ m,h,v, :, k])
                 interp = interpolate.interp2d(np.linspace(0, 8, 9), np.linspace(0, 8, 9), mapped, kind='cubic')
@@ -118,7 +120,7 @@ for m in range(23):
                 fea[ m, h,v, k, :, :] = Z2
 
 print('\n ########## save ############')
-np.save('../../data_input/dreamer_all/cnn_fea_map.npy',fea)  # (23,18,58,4,32,32)
-np.save('../../data_input/dreamer_all/label_a.npy',lab_a)  #  (23,18,58)
-np.save('../../data_input/dreamer_all/label_v.npy',lab_v)  #  (23,18,58)
-np.save('../../data_input/dreamer_all/label_d.npy',lab_d)  #  (23,18,58)
+np.save('../../data_input/dreamer_all/cnn_fea_map.npy',fea)  # (23,18,57,4,32,32)
+np.save('../../data_input/dreamer_all/label_a.npy',lab_a)  #  (23,18,57)
+np.save('../../data_input/dreamer_all/label_v.npy',lab_v)  #  (23,18,57)
+np.save('../../data_input/dreamer_all/label_d.npy',lab_d)  #  (23,18,57)
