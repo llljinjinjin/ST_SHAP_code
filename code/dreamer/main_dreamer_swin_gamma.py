@@ -79,33 +79,31 @@ def Split_Sets_10_Fold(total_fold, data):
         test_index.append(test_i)
     return train_index, test_index
 
-score = np.zeros([23,10,3])
-f1 = np.zeros([23,10,3])
-k = np.zeros([23,10,3])
-conMat = np.zeros([23,10,3, 2, 2])
-best_acc=np.zeros([23,3])
+score = np.zeros([23,10,2])
+f1 = np.zeros([23,10,2])
+k = np.zeros([23,10,2])
+conMat = np.zeros([23,10,2, 2, 2])
 total_fold = 10
 
-fea = np.load('../../data_input/dreamer_all/cnn_fea_map.npy').reshape([23,18*58,4,32,32])  # 23,1044,4,32,32
-lab_a = np.load('../../data_input/dreamer_all/label_a.npy').reshape([23,18*58])  # 23,1044
-lab_d = np.load('../../data_input/dreamer_all/label_d.npy').reshape([23,18*58])
-lab_v = np.load('../../data_input/dreamer_all/label_v.npy').reshape([23,18*58])
+fea = np.load('../../data_input/dreamer_all/cnn_fea_map.npy').reshape([23,18*57,4,32,32])  
+lab_a = np.load('../../data_input/dreamer_all/label_a.npy').reshape([23,18*57]) 
+lab_d = np.load('../../data_input/dreamer_all/label_d.npy').reshape([23,18*57])
+lab_v = np.load('../../data_input/dreamer_all/label_v.npy').reshape([23,18*57])
 print(fea.shape, lab_a.shape,lab_d.shape,lab_v.shape)
 for ind in range(23):
-    tmp_fea = fea[ind]  # (1044,4,32,32)  gamma
+    tmp_fea = fea[ind]
+    best_model=np.zeros([2])
     [train_index, test_index] = Split_Sets_10_Fold(total_fold, tmp_fea)
     for shizhe in range(10):
-        for biao in range(3):
+        for biao in range(2):
             if biao==0:
-                tmp_lab = lab_a[ind]  # (1044)
-            elif biao==1:
-                tmp_lab = lab_d[ind]  # (1044)
+                tmp_lab = lab_a[ind]  
             else:
-                tmp_lab = lab_v[ind]  # (1044)
+                tmp_lab = lab_v[ind]  
             print(tmp_fea.shape, tmp_lab.shape)
 
-            x_train = tmp_fea[train_index[shizhe]]  # Get training data 939,4,32,32
-            x_test = tmp_fea[test_index[shizhe]]  # Get test data  105,4,32,32
+            x_train = tmp_fea[train_index[shizhe]]  # Get training data 923,4,32,32
+            x_test = tmp_fea[test_index[shizhe]]  # Get test data  103,4,32,32
             y_train = tmp_lab[train_index[shizhe]]  # Get training tag
             y_test = tmp_lab[test_index[shizhe]]  # Get test tag
 
@@ -127,9 +125,8 @@ for ind in range(23):
                 window_size=2,
                 mlp_ratio=4., qkv_bias=True, qk_scale=None,
                 drop_rate=0.17, attn_drop_rate=0.17, drop_path_rate=0.1,
-                ape=False, patch_norm=True,
-                use_checkpoint=False, fused_window_process=False,
-
+                patch_norm=True,
+                use_checkpoint=False, 
             ).to(device)
 
             optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
@@ -138,14 +135,14 @@ for ind in range(23):
 
 
 
-            x_train_, y_train_ = x_train_fea.to(device), y_train_lab.to(device)  # xtrain(939,4,32,32)   ytrain(939)
-            x_test_, y_test_ = x_test_fea.to(device), y_test_lab.to(device)  #xtest(105,4,32,32)      ytest(105)
+            x_train_, y_train_ = x_train_fea.to(device), y_train_lab.to(device)  # xtrain(923,4,32,32)  
+            x_test_, y_test_ = x_test_fea.to(device), y_test_lab.to(device)  #xtest(103,4,32,32)  
 
             train_set = TensorDataset(x_train_, y_train_)
             train_loader = DataLoader(dataset=train_set, batch_size=32, shuffle=True)
 
             train_loss_avg = []
-            for epoch in tqdm(range(10)):
+            for epoch in tqdm(range(1500)):
                 train_loss = []
                 model.train()
                 for i, data in enumerate(train_loader):
@@ -170,34 +167,30 @@ for ind in range(23):
             conMat[ind,shizhe,biao] = Mat
             print("The {} category experiment acc of the {} person of the {} time is {}".format(biao,ind+1,shizhe+1,score[ind,shizhe,biao]))
             
-            if(best_acc[ind,biao]<acc):
-                best_acc[ind,biao]=acc
-                torch.save(model, './model/dreamer/onlyswin_gamma_' + str(ind)+'_'+str(biao)+ '.pth')
+            if score[ind,shizhe,biao] >best_model[biao]:
+                best_model[biao]=score[ind,shizhe,biao]
+                torch.save(model, '../../model/model_explain_new/dreamerSwin_' + str(ind) +'_'+str(biao)+ '.pth')
 
     np.save(f'../../result/dreamer/acc{ind}.npy', score[ind])
     np.save(f'../../result/dreamer/f1{ind}.npy', f1[ind])
     np.save(f'../../result/dreamer/kappa{ind}.npy', k[ind])
     np.save(f'../../result/dreamer/conMat{ind}.npy', conMat[ind])
 
-accsum = np.zeros([3, 23, 10])
+accsum = np.zeros([2, 23, 10])
 for human in range(23):
     for sz in range(10):
-        for zhi in range(3):
+        for zhi in range(2):
             if zhi == 0:
-                print("The {} person's {} AROUSAL experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 0]))
-                accsum[0, human, sz] = accsum[0, human, sz] + score[sz, human, 0]
-            elif zhi == 1:
-                print("The {} person's {} DOMINANCE experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 1]))
-                accsum[1, human, sz] = accsum[1, human, sz] + score[sz, human, 1]
+                print("The {} person's {} AROUSAL experiment acc is: {}".format(human + 1, sz + 1, score[human,sz,0]))
+                accsum[0, human, sz] = accsum[0, human, sz] + score[human,sz,0]
             else:
-                print("The {} person's {} VALANCE experiment acc is: {}".format(human + 1, sz + 1, score[sz, human, 2]))
-                accsum[2, human, sz] = accsum[2, human, sz] + score[sz, human, 2]
+                print("The {} person's {} VALANCE experiment acc is: {}".format(human + 1, sz + 1, score[human,sz,1]))
+                accsum[1, human, sz] = accsum[1, human, sz] + score[human,sz,1]
 
 
-print("_____________________________________________________Ten percent off____________________________________________________________")
-print("average Arousal：{}".format(np.mean(np.mean(accsum[0], axis=0))))
-print("average Dominance：{}".format(np.mean(np.mean(accsum[1], axis=0))))
-print("average Valance：{}".format(np.mean(np.mean(accsum[2], axis=0))))
+print("_____________________________________________The average of ten cross-validations for all_____________________________________________________")
+print("average Arousal：{}".format(np.mean(np.mean(accsum[0], axis=1))))
+print("average Valance：{}".format(np.mean(np.mean(accsum[1], axis=1))))
 
 
 
