@@ -52,7 +52,8 @@ def eval_test(model, x, y):
                     count=count+1
             acc = accuracy_score(pred, lab)  # acc
             conMat = confusion_matrix(pred, lab)  # confusion matrix
-            f = f1_score(pred, lab, average=None)[0]  # f1
+            f_ = f1_score(pred, lab, average=None)  # f1
+            f=np.mean(f_,axis=0)
             # kappa
             axis1 = np.sum(conMat, axis=1)
             axis0 = np.sum(conMat, axis=0)
