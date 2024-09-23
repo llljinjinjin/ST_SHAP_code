@@ -7,13 +7,6 @@ from typing import Optional
 
 
 def drop_path_f(x, drop_prob: float = 0., training: bool = False):
-    """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
-    This is the same as the DropConnect impl I created for EfficientNet, etc networks, however,
-    the original name is misleading as 'Drop Connect' is a different form of dropout in a separate paper...
-    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ... I've opted for
-    changing the layer and argument names to 'drop path' rather than mix DropConnect as a layer name and use
-    'survival rate' as the argument.
-    """
     if drop_prob == 0. or not training:
         return x
     keep_prob = 1 - drop_prob
@@ -25,8 +18,6 @@ def drop_path_f(x, drop_prob: float = 0., training: bool = False):
 
 
 class DropPath(nn.Module):
-    """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
-    """
 
     def __init__(self, drop_prob=None):
         super(DropPath, self).__init__()
@@ -136,9 +127,6 @@ class PatchMerging(nn.Module):
         # padding is required if H and W of the input feature map are not multiples of 2 because the downsampling is twice
         pad_input = (H % 2 == 1) or (W % 2 == 1)
         if pad_input:
-            # Now (B,H,W,C) is still going from back to front
-            # (C_front, C_back, W_left, W_right, H_top, H_bottom)
-            # Note that the Tensor channels here are [B, H, W, C], so they will be a little different from the official document
             x = F.pad(x, (0, 0, 0, W % 2, 0, H % 2))
 
         x0 = x[:, 0::2, 0::2, :]  # [B, H/2, W/2, C]
@@ -177,8 +165,7 @@ class Mlp(nn.Module):
         x = self.drop2(x)
         return x
 
-# Here head_dim is dk, and in MSA each head must have its own relative position table, and then generate the relative position index table
-# Window based multi-head Self-attention (W-MSA) module with relative position bias. It supports both shifted and unshifted Windows
+
 class WindowAttention(nn.Module):
     r""" Window based multi-head self attention (W-MSA) module with relative position bias.
     It supports both of shifted and non-shifted window.
@@ -205,39 +192,29 @@ class WindowAttention(nn.Module):
         # Each head has its own relative_position_bias_table
         self.relative_position_bias_table = nn.Parameter(
             torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads))  # [2*Mh-1 * 2*Mw-1, nH]
-
-        # Gets the pairwise relative position index for each tag in the window
-        # First we use the torch.arange and torch.meshgrid functions to generate the corresponding coordinates
+        
         coords_h = torch.arange(self.window_size[0])
         coords_w = torch.arange(self.window_size[1])
-        # Generate the corresponding coordinates, then stack them and expand them into a two-dimensional vector
-        # meshgrid where the first output tensor fills the elements in the first input tensor, all the same; The second output tensor fills the elements in the second input tensor in the same columns.
-        # meshgrid generates a grid and then splices it using the stack method
+
         coords = torch.stack(torch.meshgrid([coords_h, coords_w], indexing="ij"))  # [2, Mh, Mw]
         coords_flatten = torch.flatten(coords, 1)  # [2, Mh*Mw]
-        # The broadcast mechanism is used to insert a dimension in the first dimension and the second dimension respectively to carry out broadcast subtraction
+
         # [2, Mh*Mw, 1] - [2, 1, Mh*Mw]
         relative_coords = relative_coords = coords_flatten.unsqueeze(2) - coords_flatten.unsqueeze(
             1)  # [2, Mh*Mw, Mh*Mw]
-        # Since we're subtracting, the resulting index starts at a negative number, so we add the offset to make it start at 0.
-        relative_coords = relative_coords.permute(1, 2, 0).contiguous()  # [Mh*Mw, Mh*Mw, 2] Adjust the axes Wh*Ww, Wh*Ww, 2 that is, each inside is a two-dimensional coordinate
+        relative_coords = relative_coords.permute(1, 2, 0).contiguous()  
         relative_coords[:, :, 0] += self.window_size[0] - 1  # shift to start from 0
         relative_coords[:, :, 1] += self.window_size[1] - 1
-        # Then we need to expand it into a one-dimensional offset. And for the coordinates (1,2) and (2,1). It's different in two dimensions, but by adding the x and y coordinates to convert the one-dimensional offset, the offset is the same.
-        # So finally we do a multiplication operation between them to distinguish this time the index range is y:[0, 2*(window_size-1)*(2 * window_size-1)], x:[0, 2*(window_size-1)]
         relative_coords[:, :, 0] *= 2 * self.window_size[1] - 1
-        # Then sum over the last dimension and expand to a one-dimensional coordinate
-        # This time the index range is [0, 2 * (window_size-1) * (2 * window_size-1) + 2 * (window_size-1)] to simplify [0, (2 * window_size - 1) * (2 * window_size - 1) - 1]
         relative_position_index = relative_coords.sum(-1)  # [Mh*Mw, Mh*Mw]
-        # The window_size remains the same throughout the training, so the index does not change
-        self.register_buffer("relative_position_index", relative_position_index)  # And register as a variable that does not participate in online learning
+        self.register_buffer("relative_position_index", relative_position_index)  
 
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj = nn.Linear(dim, dim)  # Multi-head fusion
         self.proj_drop = nn.Dropout(proj_drop)
 
-        nn.init.trunc_normal_(self.relative_position_bias_table, std=.02)  # And initialized to a truncated normal distribution
+        nn.init.trunc_normal_(self.relative_position_bias_table, std=.02)  
         self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x, mask: Optional[torch.Tensor] = None):
@@ -248,16 +225,12 @@ class WindowAttention(nn.Module):
         """
         # [batch_size*num_windows, Mh*Mw, total_embed_dim]
         B_, N, C = x.shape  
-        # qkv(): -> [batch_size*num_windows, Mh*Mw, 3 * total_embed_dim]
-        # reshape: -> [batch_size*num_windows, Mh*Mw, 3, num_heads, embed_dim_per_head]
-        # permute: -> [3, batch_size*num_windows, num_heads, Mh*Mw, embed_dim_per_head]
+
         qkv = self.qkv(x).reshape(B_, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
-        # [batch_size*num_windows, num_heads, Mh*Mw, embed_dim_per_head]
-        # qkv was obtained separately by unbind
+
         q, k, v = qkv.unbind(0)  
 
-        # transpose: -> [batch_size*num_windows, num_heads, embed_dim_per_head, Mh*Mw]
-        # @: multiply -> [batch_size*num_windows, num_heads, Mh*Mw, Mh*Mw]
+
         q = q * self.scale  # attn tensor of shape (numWindows*B, num_heads, window_size*window_size, window_size*window_size)
         attn = (q @ k.transpose(-2, -1))
 
@@ -265,16 +238,13 @@ class WindowAttention(nn.Module):
         relative_position_bias = self.relative_position_bias_table[self.relative_position_index.view(-1)].view(
             self.window_size[0] * self.window_size[1], self.window_size[0] * self.window_size[1], -1)
         relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()  # [nH, Mh*Mw, Mh*Mw]
-        # Relative position encoding is done here by adding a batch dimension to unsqueeze
+  
         attn = attn + relative_position_bias.unsqueeze(0)
 
-        # Ignoring the mask for the moment, the only thing left is softmax, dropout, and V matrix multiplication like transformer, and then go through a layer of full connection layer and dropout
-        # When SiftedWindowAttention is required, mask is not None, which requires adding mask to the Attention result attn and passing softmax, the value in the -100 position will be ignored after passing softmax.
         if mask is not None:
             # mask: [nW, Mh*Mw, Mh*Mw]
             nW = mask.shape[0]  # num_windows
-            # attn.view: [batch_size, num_windows, num_heads, Mh*Mw, Mh*Mw]
-            # mask.unsqueeze: [1, nW, 1, Mh*Mw, Mh*Mw]
+
             attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(0)
             attn = attn.view(-1, self.num_heads, N, N)
             attn = self.softmax(attn)
@@ -283,16 +253,14 @@ class WindowAttention(nn.Module):
 
         attn = self.attn_drop(attn)
 
-        # @: multiply -> [batch_size*num_windows, num_heads, Mh*Mw, embed_dim_per_head]
-        # transpose: -> [batch_size*num_windows, Mh*Mw, num_heads, embed_dim_per_head]
-        # reshape: -> [batch_size*num_windows, Mh*Mw, total_embed_dim]
+
         x = (attn @ v).transpose(1, 2)
         x = x.reshape(B_, N, C)
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
 
-#  Before entering SwinTransformerBlock, the one experienced on x is create_mask with dimensions [B, HW, C], so H and W need to be passed in separately
+
 class SwinTransformerBlock(nn.Module):
     r""" Swin Transformer Block.
     Args:
@@ -328,7 +296,7 @@ class SwinTransformerBlock(nn.Module):
             dim, window_size=(self.window_size, self.window_size), num_heads=num_heads, qkv_bias=qkv_bias,
             attn_drop=attn_drop, proj_drop=drop)
 
-        # DropPath is a network regularization method for branch networks. Deep networks can be built without residuals.
+
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         # LN
         self.norm2 = norm_layer(dim)
@@ -336,8 +304,7 @@ class SwinTransformerBlock(nn.Module):
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
 
-    # shortcut is to implement residuals and then change the dimension of x to (B, H, W, C). We also make sure that the feature map is an integer multiple of window_size, so we do a padding, where the dimensions are (B, Hp, Wp, C).
-    # If shift_size is 0, it means that it is W-MSA and does not need to be shifted. Then divide the window and dimensionally transform
+
     def forward(self, x, attn_mask):
         # x(B,L,C)
         H, W = self.H, self.W
@@ -349,7 +316,7 @@ class SwinTransformerBlock(nn.Module):
         x = self.norm1(x)
         x = x.view(B, H, W, C) # (32,8,8,96)
 
-        # pad feature maps to multiples of window size
+   
         pad_l = pad_t = 0
         pad_r = (self.window_size - W % self.window_size) % self.window_size
         pad_b = (self.window_size - H % self.window_size) % self.window_size
@@ -367,8 +334,7 @@ class SwinTransformerBlock(nn.Module):
         x_windows = window_partition(shifted_x, self.window_size)  # [nW*B, Mh, Mw, C]
         x_windows = x_windows.view(-1, self.window_size * self.window_size, C)  # [nW*B, Mh*Mw, C]
 
-        # attn_mask is passed to WindowAttention here, which will later undo window partitioning, restore the shift, and remove the padding
-        # W-MSA/SW-MSA calculates Attention and uses attn_mask to distinguish between Window Attention and Shift Window Attention
+
         attn_windows = self.attn(x_windows, mask=attn_mask)  # [nW*B, Mh*Mw, C]
 
         # Window restore
@@ -421,9 +387,6 @@ class BasicLayer(nn.Module):
         self.use_checkpoint = use_checkpoint
         self.shift_size = window_size // 2  
 
-        # All blocks in the current stage
-        # depth is the number of blocks in this stage, and downsample means patch merging
-        # Note that there will only be one MSA in each block, either W-MSA or SW-MSA, so shift_size is 0 for W-MSA, not 0 for SW-MSA
         self.blocks = nn.ModuleList([
             SwinTransformerBlock(
                 dim=dim,
@@ -448,7 +411,6 @@ class BasicLayer(nn.Module):
         # calculate attention mask for SW-MSA
         Hp = int(np.ceil(H / self.window_size)) * self.window_size
         Wp = int(np.ceil(W / self.window_size)) * self.window_size
-        # The channel sequence is the same as that of the feature map for subsequent window_partition
         img_mask = torch.zeros((1, Hp, Wp, 1), device=x.device)  # [1, Hp, Wp, 1]
         
         # Set the slice, dividing the mask into 3 parts from the line
@@ -472,13 +434,10 @@ class BasicLayer(nn.Module):
         mask_windows = mask_windows.view(-1, self.window_size * self.window_size)  # [nW, Mh*Mw] 
         attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)  # [nW, 1, Mh*Mw] - [nW, Mh*Mw, 1]
         
-        # [nW, Mh*Mw, Mh*Mw] The corresponding region of each window is obtained by the subtraction above. The same region is 0, and the different values are other values. attn_mask specifies -100 in the field other than 0
-        # attn_mask: The mask used for attention. attention is calculated only between elements of the same window, and direct passes for different Windows are marked as -100 so that the original data is not affected.
         attn_mask = attn_mask.masked_fill(attn_mask != 0, float(-100.0)).masked_fill(attn_mask == 0, float(0.0))
         return attn_mask
 
     def forward(self, x, H, W):
-        # First create a mask that does not change while the image size remains the same
         attn_mask = self.create_mask(x, H, W)  # [nW, Mh*Mw, Mh*Mw]
         for blk in self.blocks:
             blk.H, blk.W = H, W
@@ -488,12 +447,12 @@ class BasicLayer(nn.Module):
                 x = blk(x, attn_mask)  
         if self.downsample is not None:
             x = self.downsample(x, H, W)
-            # Prevents H and W from being odd. If it's odd, it's even after a padding in the downsample, but if you don't add one to H and one to W, you lose one. If it's even, add one to divide two and it's still the same
+            
             H, W = (H + 1) // 2, (W + 1) // 2
 
         return x, H, W
 
-# The whole model adopts a hierarchical design, including 4 stages. Each stage will reduce the resolution of the input feature map and expand the receptive field layer by layer like CNN.
+
 class SwinTransformer(nn.Module):
     r""" Swin Transformer
     Args:
@@ -530,21 +489,18 @@ class SwinTransformer(nn.Module):
         self.num_features = int(embed_dim * 2 ** (self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
                      
-        # Corresponds to the Patch partition and Linear Embedding
+        
         self.patch_embed = PatchEmbed(
             patch_size=patch_size, in_c=in_chans, embed_dim=embed_dim,
             norm_layer=norm_layer if self.patch_norm else None)
         self.pos_drop = nn.Dropout(p=drop_rate)
 
-        # The dropout rate in each block is an increasing sequence
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
 
         # build layers
         self.layers = nn.ModuleList()
         for i_layer in range(self.num_layers):
-            # num_layers and stage numbers
-            # dim is the dimension of the current stage, depth is how many blocks are stacked on the current stage, and drop_patch is the drop_patch of all blocks in this layer
-            # downsample is Patch merging and is None on the last stage
+
             layers = BasicLayer(dim=int(embed_dim * 2 ** i_layer),
                                 depth=depths[i_layer],
                                 num_heads=num_heads[i_layer],
@@ -555,18 +511,17 @@ class SwinTransformer(nn.Module):
                                 attn_drop=attn_drop_rate,
                                 drop_path=dpr[sum(depths[:i_layer]):sum(depths[:i_layer + 1])],  
                                 norm_layer=norm_layer,
-                                #  Different from the paper, the stage in the code contains the Patch merging of the next layer, so there is no Patch merging in the last stage
                                 downsample=PatchMerging if (i_layer < self.num_layers - 1) else None,
                                 use_checkpoint=use_checkpoint)
             self.layers.append(layers)
 
         self.norm = norm_layer(self.num_features)
-        self.avgpool = nn.AdaptiveAvgPool1d(1)  # In this classification task, replace cls tokens with global averaging pooling
+        self.avgpool = nn.AdaptiveAvgPool1d(1)  
         self.head = nn.Linear(self.num_features, num_classes) if num_classes > 0 else nn.Identity()
 
         self.apply(self._init_weights)
 
-    # Weight initialization function
+
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
             nn.init.trunc_normal_(m.weight, std=.02)
