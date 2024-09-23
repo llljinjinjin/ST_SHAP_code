@@ -11,14 +11,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # load the models
-model = torch.load('../../model/seed/onlyswin_gamma_1.pth')
+model = torch.load('./model/seed/onlyswin_gamma_1.pth')
 
 # Load data set
 X= np.zeros([3, 342, 4, 32, 32])
 y= np.zeros([3, 342])
 for jnd in range(3):
-    fea = np.load('../../data_input/input_4/cnn_fea_map_1.npy').reshape([3, 15 * 57, 4, 32, 32])
-    lab = np.load('../../data_input/input_4/label_1.npy').reshape([3, 15 * 57])
+    fea = np.load('./data_input/input_4/cnn_fea_map_1.npy').reshape([3, 15 * 57, 4, 32, 32])
+    lab = np.load('./data_input/input_4/label_1.npy').reshape([3, 15 * 57])
     lab = lab + 1
     print(fea.shape, lab.shape)
     tmp_fea = fea[jnd]
