@@ -577,7 +577,7 @@ class SwinTransformer(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
     def forward(self, x):
-        # x: [B, L, C]
+        # x: 32 4 32 32
         x, H, W = self.patch_embed(x)
         x = self.pos_drop(x)
 
