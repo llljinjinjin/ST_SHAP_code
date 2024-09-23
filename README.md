@@ -9,7 +9,6 @@ This study is the first to use SwinTransformer as an emotional EEG recognition m
 
 ## Resources
 * SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
-- DREAMER:[LINK](https://ieeexplore.ieee.org/abstract/document/7887697)
 
 ## Instructions
 ### Install the dependencies
@@ -19,7 +18,7 @@ pip install -r requirements.txt
 ```
 
 ### Obtain the raw dataset
-* Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED/DREAMER data in mat file format.
+* Download the raw dataset from the [resources](#resources) above, and save them to the `data_input` folder.  Please download the SEED data in mat file format.
 - Organize the raw data file into the following file structure:
 ```
  DatasetDir/dataset
@@ -30,41 +29,28 @@ pip install -r requirements.txt
                 /...
           -/label
                 -/label.mat
-                .
-          -/DREAMER.mat          
+                .    
 ```
-Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively. For the DREAMER file, it contains the data and labels for that dataset.
+Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively.
 
 ### Pre-process the raw dataset
 To pre-trained SEED, run:
 ```
 process_new.py
 ```
-To pre-trained DREAMER, run:
-```
-process_dreamer.py
-```
-Please create folders `input_4` and `dreamer_all` in the `data_input` directory to store the processed data.  
+Please create folders `input_4`  in the `data_input` directory to store the processed data.  
 
 ### Model training
 For SEED, run:
 ```
-main_dreamer_swin_gamma.py
-```
-For DREAMER, run;
-```
 main_seed_swin_gamma.py
 ```
-Please save the model files of the corresponding data set respectively in the `seed` and `dreamer` files under the `model` directory, and please unify the format of ***pth***.
+Please save the model files of the corresponding data set respectively in the `seed` files under the `model` directory, and please unify the format of ***pth***.
 
 ### Model explaining
 For SEED, please load the above model file stored in the `model/seed` folder and the preprocessed data stored in `data_input/input_4` respectively, and run:
 ```
 shap_explain_mean.py
-```
-For DREAMER, please load the above model file saved in the `model/dreamer` folder and the preprocessed data saved in `data_input/dreamer_all` and run:
-```
-shap_explain.py
 ```
 
 ## Results
