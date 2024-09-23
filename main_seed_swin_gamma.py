@@ -85,7 +85,7 @@ for ind in range(1,16):
             patch_size=4,
             in_chans=4, num_classes=3,
             embed_dim=96,
-            depths=[2, 2, 6, 2],  # Number of floors
+            depths=[2, 2, 6, 2],  
             num_heads=[3, 6, 12, 24],
             window_size=2,
             mlp_ratio=4., qkv_bias=True,
