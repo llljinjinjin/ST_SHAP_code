@@ -247,14 +247,14 @@ class WindowAttention(nn.Module):
             mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
         """
         # [batch_size*num_windows, Mh*Mw, total_embed_dim]
-        B_, N, C = x.shape  #  128，16，96
+        B_, N, C = x.shape  
         # qkv(): -> [batch_size*num_windows, Mh*Mw, 3 * total_embed_dim]
         # reshape: -> [batch_size*num_windows, Mh*Mw, 3, num_heads, embed_dim_per_head]
         # permute: -> [3, batch_size*num_windows, num_heads, Mh*Mw, embed_dim_per_head]
         qkv = self.qkv(x).reshape(B_, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
         # [batch_size*num_windows, num_heads, Mh*Mw, embed_dim_per_head]
         # qkv was obtained separately by unbind
-        q, k, v = qkv.unbind(0)  # make torchscript happy (cannot use tensor as tuple)分配给qkv 128，3，16，32
+        q, k, v = qkv.unbind(0)  
 
         # transpose: -> [batch_size*num_windows, num_heads, embed_dim_per_head, Mh*Mw]
         # @: multiply -> [batch_size*num_windows, num_heads, Mh*Mw, Mh*Mw]
@@ -364,8 +364,8 @@ class SwinTransformerBlock(nn.Module):
             attn_mask = None
 
         # partition windows
-        x_windows = window_partition(shifted_x, self.window_size)  # [nW*B, Mh, Mw, C](128,4,4,96)
-        x_windows = x_windows.view(-1, self.window_size * self.window_size, C)  # [nW*B, Mh*Mw, C](128,16,96)
+        x_windows = window_partition(shifted_x, self.window_size)  # [nW*B, Mh, Mw, C]
+        x_windows = x_windows.view(-1, self.window_size * self.window_size, C)  # [nW*B, Mh*Mw, C]
 
         # attn_mask is passed to WindowAttention here, which will later undo window partitioning, restore the shift, and remove the padding
         # W-MSA/SW-MSA calculates Attention and uses attn_mask to distinguish between Window Attention and Shift Window Attention
