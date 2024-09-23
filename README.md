@@ -1,6 +1,6 @@
 # ST_SHAP
 
-This is a PyTorch implementation of the ***ST-SHAP:A novel explainable attention network for EEG-based emotion recognition***.
+This is a PyTorch implementation of the ***ST-SHAP: A hierarchical and explainable attention network for emotional EEG representation learning and decoding***.
 # ST-SHAP： Architecture
 ![](https://github.com/llljinjinjin/ST_SHAP_code/blob/main/ST_SHAP.png)
 A schematic illustration of our proposed ST-SHAP method. (a) 3D spatial-temporal feature generation (b) Swin Transformer for emotional EEG classification (c) Explainability analysis based on SHAP.
@@ -75,7 +75,7 @@ The classification results for our method and other competing methods are as fol
 
 ## Cite:
 If you find this architecture or toolbox useful then please cite this paper:
-ST-SHAP:A novel explainable attention network for EEG-based emotion recognition
+ST-SHAP: A hierarchical and explainable attention network for emotional EEG representation learning and decoding
 
 ## Acknowledgment
 We thank Liu Z et al and Lundberg S M et al for their wonderful works.
