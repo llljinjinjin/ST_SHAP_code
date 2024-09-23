@@ -4,7 +4,7 @@ from tqdm import tqdm
 import torch
 from model.SWIN_trans import SwinTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 import heapq
 from einops import rearrange, repeat, reduce
 import time
@@ -32,12 +32,12 @@ def eval_test(model, x, y):
     :param model:
     :param x:
     :param y:
-    :return: Return acc, confusion matrix, f1, kappa for test
+    :return: Return acc, confusion matrix, kappa for test
     """
     data_set = TensorDataset(x, y)
     data_loader = DataLoader(dataset=data_set, batch_size=x.shape[0], shuffle=True)
     model.eval()
-    acc, conMat, f, kappa = None, None, None, None
+    acc, conMat, kappa = None, None, None
     with torch.no_grad():
         for i, d in enumerate(data_loader):
             inp, lab = d
