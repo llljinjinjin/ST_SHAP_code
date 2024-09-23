@@ -63,15 +63,6 @@ The classification results for our method and other competing methods are as fol
 | SEED  | 40% testing, 60% training   | 82.96±9.95  |92.38±7.04|93.12±6.06|93.38±5.96|90.40±8.49|94.24±5.95|96.02±2.17|96.67±2.8|97.18±2.7|
 </div>
 
-### DREAMER
-<div align="center">
- 
-| Methodology |  Test mode | Conti-CNN |SVM|DT |GECNN|BDAE|THR|DGCNN|RF|Deep-forest|3DFR-DFCN|Bi-AAN|GLFANet|ST-SHAP|
-| ---------- |-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| Arousal(%) | ten cross-validation|82.48 |84|84.48|84.54|86.60|88.20|88.79|89.58|90.41|91.30|92.95|94.82|96.06|
-| Valance(%) | ten cross-validation| 81.72 |84.63|84.77|86.23|88.60|90.43|88.87|89.42|89.03|93.15|92.68|94.57|96.07|
-</div>
-
 
 ## Cite:
 If you find this architecture or toolbox useful then please cite this paper:
