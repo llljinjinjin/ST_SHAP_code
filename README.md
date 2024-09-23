@@ -3,7 +3,7 @@
 This is a PyTorch implementation of the ***ST-SHAP:A novel explainable attention network for EEG-based emotion recognition***.
 # ST-SHAP： Architecture
 ![](https://github.com/llljinjinjin/ST_SHAP_code/blob/main/ST_SHAP.png)
-In the figure above (a), the original EEG signal is preprocessed, then topologically interpolated according to the electrode distribution location, and emotion recognition is performed by (b) Swin Transformer. Finally, the model decision is explained by (c) SHAP method.
+A schematic illustration of our proposed ST-SHAP method. (a) 3D spatial-temporal feature generation (b) Swin Transformer for emotional EEG classification (c) Explainability analysis based on SHAP.
 
 This study is the first to use SwinTransformer as an emotional EEG recognition model to apply concepts from the field of computer vision (CV) to the field of EEG based emotion recognition. The aim is to deeply explore the local and global dependencies in the spatial domain of affective EEG, and to interpret the lead information.
 
