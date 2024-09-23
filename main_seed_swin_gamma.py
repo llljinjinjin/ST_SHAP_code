@@ -47,19 +47,16 @@ def eval_test(model, x, y):
             lab = lab.cpu().detach().numpy()
             acc = accuracy_score(pred, lab)  # acc
             conMat = confusion_matrix(pred, lab)  # confusion matrix
-            f_ = f1_score(pred, lab, average=None)  # f1
-            f=np.mean(f_,axis=0)
             # kappa
             axis1 = np.sum(conMat, axis=1)
             axis0 = np.sum(conMat, axis=0)
             p_e = np.sum(axis1 * axis0) / np.sum(conMat) ** 2
             p_o = acc
             kappa = (p_o - p_e) / (1 - p_e)
-    return acc, conMat, f, kappa
+    return acc, conMat, kappa
 
 
 score = np.zeros([15, 3])
-f1 = np.zeros([15, 3])
 k = np.zeros([15, 3])
 conMat = np.zeros([15, 3, 3, 3])
 
@@ -128,10 +125,9 @@ for ind in range(1,16):
             train_acc = evaluate(model, x_train_, y_train_)
             print('\n Train acc: {}'.format(train_acc.item()))
 
-        acc, Mat, f, kappa = eval_test(model, x_test_, y_test_)
+        acc, Mat, kappa = eval_test(model, x_test_, y_test_)
         print('\n Test acc: {}'.format(acc))
         score[ind - 1, jnd] = acc
-        f1[ind - 1, jnd] = f
         k[ind - 1, jnd] = kappa
         conMat[ind - 1, jnd] = Mat
     torch.save(model, '../../model/seed/onlyswin_gamma_' + str(ind)+'_'+ str(jnd)+ '.pth')
@@ -148,7 +144,6 @@ for human in range(1,16):
 print(np.mean(np.mean(score, axis=0)))
 
 np.save('./result/seed/acc.npy', score)
-np.save('./result/seed/f1.npy', f1)
 np.save('./result/seed/kappa.npy', k)
 np.save('./result/seed/conMat.npy', conMat)
 
