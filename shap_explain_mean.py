@@ -45,19 +45,10 @@ print(to_explain.shape)  # test (342*3,4, 32, 32)
 
 class_names = {'0': ['negative'], '1': ['neutral'], '2': ['positive']}
 
-# The first parameter of the shap interpreter can be a model object or a tuple (the model, the number of layers of the model) and the second parameter is the background data set
-# If the input is a tuple, the returned shap value will be used for the input layer of the layer parameter must be a layer in the model
 # print(model)
 e = shap.GradientExplainer(model, X)
 
-# Calculated shap_value The first parameter is the x-normalized image (the sample tensor used to interpret the model output) the second parameter is the number of selected output indexes and the third parameter is the number of samples taken
-# shap_values is a numpy arraylist for each output column group
-# indexes is a matrix that tells each sample which output indexes are selected as 'top'
-# For a model with a single output, it returns a SHAP value tensor with the same shape as X; For a model with multiple outputs, it returns a list of SHAP value tensors, each with the same shape as X
-# If ranked_outputs is None, then this tensor list matches the number of model outputs. If ranked_outputs is a positive integer that only explains many top-level model outputs, then return a pair (shap_values, indexes).
-# Where shap_values is a list of tensors of length ranked_outputs and index is a matrix of which output indexes are selected as 'top' for each sample
-
-shap_values, indexes = e.shap_values(to_explain, ranked_outputs=1, nsamples=32)  # The feature parameters are interpreted with an interpreter
+shap_values, indexes = e.shap_values(to_explain, ranked_outputs=1, nsamples=32)  
 print(shap_values[0].shape)  # (342*3, 4, 32, 32)
 print(indexes.shape)  # (342*3, 1)
 
@@ -72,7 +63,7 @@ indexes = np.array(indexes.cpu())
 to_explain = to_explain.swapaxes(2, 3).swapaxes(-1, 1)
 print(to_explain.shape)  # (342*3, 32, 32, 4)
 
-# print(np.sum(indexes == 2))
+
 
 shap_zero = np.zeros([np.sum(indexes == 0), 32, 32, 4])  # negative
 shap_one = np.zeros([np.sum(indexes == 1), 32, 32, 4])  # neutral
