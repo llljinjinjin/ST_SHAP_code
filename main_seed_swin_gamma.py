@@ -130,7 +130,7 @@ for ind in range(1,16):
         score[ind - 1, jnd] = acc
         k[ind - 1, jnd] = kappa
         conMat[ind - 1, jnd] = Mat
-    torch.save(model, '../../model/seed/onlyswin_gamma_' + str(ind)+'_'+ str(jnd)+ '.pth')
+    torch.save(model, './model/seed/onlyswin_gamma_' + str(ind)+'_'+ str(jnd)+ '.pth')
 
 
 
