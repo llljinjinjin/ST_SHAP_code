@@ -82,23 +82,22 @@ class PatchEmbed(nn.Module):
         _, _, H, W = x.shape
 
         # padding
-        # padding is required if H and W of the input image are not multiples of patch_size
         pad_input = (H % self.patch_size[0] != 0) or (W % self.patch_size[1] != 0)
         if pad_input:
             # (W_left, W_right, H_top,H_bottom, C_front, C_back)
-            # The pad is back to front, left to right, top to bottom, and the original order is (B,C,H,W). The pad order is (W,H, C).
+           
             x = F.pad(x, (0, self.patch_size[1] - W % self.patch_size[1],
                           0, self.patch_size[0] - H % self.patch_size[0],
                           0, 0))
 
-        # Subsampling patch_size times
+        
         x = self.proj(x)
         _, _, H, W = x.shape
         # flatten: [B,  C,H, W] -> [B, C, HW]
         # transpose: [B, C, HW] -> [B, H*W, C]
         x = x.flatten(2).transpose(1, 2)
         x = self.norm(x)
-        return x, H, W  # Here's the padding H and W
+        return x, H, W  
 
 
 class PatchMerging(nn.Module):
