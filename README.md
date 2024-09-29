@@ -5,7 +5,7 @@ This is a PyTorch implementation of the ***ST-SHAP: A hierarchical and explainab
 ![](https://github.com/llljinjinjin/ST_SHAP_code/blob/main/ST_SHAP.png)
 A schematic illustration of our proposed ST-SHAP method. (a) 3D spatial-temporal feature generation (b) Swin Transformer for emotional EEG classification (c) Explainability analysis based on SHAP.
 
-This study is the first to use SwinTransformer as an emotional EEG recognition model to apply concepts from the field of computer vision (CV) to the field of EEG based emotion recognition. The aim is to deeply explore the local and global dependencies in the spatial domain of affective EEG, and to interpret the lead information.
+In order to simultaneously and fully capture the local characteristics and global dependencies of emotional EEG data on spatial-temporal domains, we explore the adaptation of Swin Transformer for EEG-based emotion recognition. Furthermore, the explainability of the Swin Transformer based emotional EEG decoding model is deeply investigated via the SHapley Additive exPlanations (SHAP) method and neurophysiological prior knowledge. As a whole, we propose a novel hierarchical and explainable attention network, ST-SHAP, for EEG-based emotion recognition.
 
 ## Resources
 * SEED:[LINK](https://bcmi.sjtu.edu.cn/~seed/index.html)
