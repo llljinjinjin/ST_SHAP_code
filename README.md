@@ -34,7 +34,7 @@ pip install -r requirements.txt
 Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively.
 
 ### Pre-process the raw dataset
-To pre-trained SEED, run:
+To pre-process SEED, run:
 ```
 process_new.py
 ```
