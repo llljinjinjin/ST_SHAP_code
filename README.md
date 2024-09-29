@@ -31,7 +31,7 @@ pip install -r requirements.txt
                 -/label.mat
                 .    
 ```
-Specifically, for the SEED dataset, it contains the DATASET file and the label file, which hold the data and label, respectively.
+Specifically, for the SEED dataset, it contains the dataset file and the label file, which hold the data and label, respectively.
 
 ### Pre-process the raw dataset
 To pre-process SEED, run:
