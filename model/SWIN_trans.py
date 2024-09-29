@@ -10,7 +10,7 @@ def drop_path_f(x, drop_prob: float = 0., training: bool = False):
     if drop_prob == 0. or not training:
         return x
     keep_prob = 1 - drop_prob
-    shape = (x.shape[0],) + (1,) * (x.ndim - 1)  # work with diff dim tensors, not just 2D ConvNets
+    shape = (x.shape[0],) + (1,) * (x.ndim - 1)  
     random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
     random_tensor.floor()  # binarize
     output = x.div(keep_prob) * random_tensor
@@ -93,8 +93,7 @@ class PatchEmbed(nn.Module):
         
         x = self.proj(x)
         _, _, H, W = x.shape
-        # flatten: [B,  C,H, W] -> [B, C, HW]
-        # transpose: [B, C, HW] -> [B, H*W, C]
+
         x = x.flatten(2).transpose(1, 2)
         x = self.norm(x)
         return x, H, W  
@@ -111,7 +110,7 @@ class PatchMerging(nn.Module):
         super().__init__()
         self.dim = dim
         self.norm = norm_layer(4 * dim)
-        self.reduction = nn.Linear(4 * dim, 2 * dim, bias=False)  # Change the number of channels from 4 to 2
+        self.reduction = nn.Linear(4 * dim, 2 * dim, bias=False) 
 
     def forward(self, x, H, W):
         """
@@ -123,7 +122,6 @@ class PatchMerging(nn.Module):
         x = x.view(B, H, W, C)
 
         # padding
-        # padding is required if H and W of the input feature map are not multiples of 2 because the downsampling is twice
         pad_input = (H % 2 == 1) or (W % 2 == 1)
         if pad_input:
             x = F.pad(x, (0, 0, 0, W % 2, 0, H % 2))
@@ -175,20 +173,19 @@ class WindowAttention(nn.Module):
         qkv_bias (bool, optional):  If True, add a learnable bias to query, key, value. Default: True
         attn_drop (float, optional): Dropout ratio of attention weight. Default: 0.0
         proj_drop (float, optional): Dropout ratio of output. Default: 0.0
-        # (The main difference is that relative position coding is added to Q and K in the original formula for calculating Attention, while Swin Transformer limits the calculation of attention to each window).
+       
     """
 
     def __init__(self, dim, window_size, num_heads, qkv_bias=True, attn_drop=0., proj_drop=0.):
 
         super().__init__()
         self.dim = dim  #  dim (int):Number of input channels.
-        self.window_size = window_size  # [Mh, Mw]  window_size (tuple[int]):The height of the window is Wh and the width Ww
-        self.num_heads = num_heads  # num_heads (int):Number of attention heads.
+        self.window_size = window_size  # [Mh, Mw]  
+        self.num_heads = num_heads  # num_heads (int)
         head_dim = dim // num_heads
         self.scale = head_dim ** -0.5  # **power
 
         # Define a parameter table with relative position deviation
-        # Each head has its own relative_position_bias_table
         self.relative_position_bias_table = nn.Parameter(
             torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads))  # [2*Mh-1 * 2*Mw-1, nH]
         
@@ -233,7 +230,7 @@ class WindowAttention(nn.Module):
         q = q * self.scale  # attn tensor of shape (numWindows*B, num_heads, window_size*window_size, window_size*window_size)
         attn = (q @ k.transpose(-2, -1))
 
-        # relative_position_bias_table.view: [Mh*Mw*Mh*Mw,nH] -> [Mh*Mw,Mh*Mw,nH]
+
         relative_position_bias = self.relative_position_bias_table[self.relative_position_index.view(-1)].view(
             self.window_size[0] * self.window_size[1], self.window_size[0] * self.window_size[1], -1)
         relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()  # [nH, Mh*Mw, Mh*Mw]
@@ -305,7 +302,7 @@ class SwinTransformerBlock(nn.Module):
 
 
     def forward(self, x, attn_mask):
-        # x(B,L,C)
+        
         H, W = self.H, self.W
         B, L, C = x.shape
         assert L == H * W, "input feature has wrong size"
@@ -323,7 +320,7 @@ class SwinTransformerBlock(nn.Module):
         _, Hp, Wp, _ = x.shape
 
         if self.shift_size > 0:
-            # Shift the window. It's moving from top to bottom, from left to right, so it's negative
+
             shifted_x = torch.roll(x, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2))
         else:
             shifted_x = x
@@ -372,7 +369,7 @@ class BasicLayer(nn.Module):
         attn_drop (float, optional): Attention dropout rate. Default: 0.0
         drop_path (float | tuple[float], optional): Stochastic depth rate. Default: 0.0
         norm_layer (nn.Module, optional): Normalization layer. Default: nn.LayerNorm
-        downsample (nn.Module | None, optional): Do you need to downsample? No need in the last stage. Default: None
+        downsample (nn.Module | None, optional):  Default: None
         use_checkpoint (bool): Whether to use checkpointing to save memory. Default: False.
     """
 
@@ -539,9 +536,9 @@ class SwinTransformer(nn.Module):
         for layer in self.layers:
             x, H, W = layer(x, H, W)
 
-        x = self.norm(x)  # [B, L, C] 32 1 768
-        x = self.avgpool(x.transpose(1, 2))  # [B, C, 1] 32 768 1
-        x = torch.flatten(x, 1) # 32 768
+        x = self.norm(x)  # [B, L, C] 
+        x = self.avgpool(x.transpose(1, 2))  # [B, C, 1] 
+        x = torch.flatten(x, 1) 
         x = self.head(x) # 32 3
         return x
 
