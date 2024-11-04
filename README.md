@@ -47,6 +47,11 @@ main_seed_swin_gamma.py
 ```
 Please save the model files of the corresponding data set respectively in the `seed` files under the `model` directory, and please unify the format of ***pth***.
 
+### Model explaining
+For SEED, please load the above model file stored in the `model/seed` folder and the preprocessed data stored in `data_input/input_4` respectively, and run:
+```
+shapdatashow/shap_explain_mean.py
+```
 
 ## Results
 The classification results for our method and other competing methods are as follows:
