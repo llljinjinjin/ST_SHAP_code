@@ -11,14 +11,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # load the models
-model = torch.load('./model/seed/onlyswin_gamma_8.pth')
+model = torch.load('../model/seed/onlyswin_gamma_8.pth')
 
 # Load data set
 X= np.zeros([3, 342, 4, 32, 32])
 y= np.zeros([3, 342])
 for jnd in range(3):
-    fea = np.load('./data_input/input_4/cnn_fea_map_8.npy').reshape([3, 15 * 57, 4, 32, 32])
-    lab = np.load('./data_input/input_4/label_8.npy').reshape([3, 15 * 57])
+    fea = np.load('../data_input/input_4/cnn_fea_map_8.npy').reshape([3, 15 * 57, 4, 32, 32])
+    lab = np.load('../data_input/input_4/label_8.npy').reshape([3, 15 * 57])
     lab = lab + 1
     print(fea.shape, lab.shape)
     tmp_fea = fea[jnd]
@@ -106,8 +106,6 @@ fin_explain[2]=raw_2
 
 fin_explain=np.mean(fin_explain,axis=3)
 fin_explain=np.expand_dims(fin_explain,axis=3)
-# for i in range(3):
-#     fin_explain[i] = to_explain[list(y).index(i)]
 
 fin_shap_values = []
 shap_values = np.zeros([3, 32, 32, 4])
@@ -140,5 +138,6 @@ savedata2[0]=fin_explain[2]
 savedata2[1]=fin_shap_values[2]
 savpos=np.squeeze(savedata2)
 np.save('./shapdatashow/seed/sub8/pos.npy',savpos)
+
 # Generate image
 shap.image_plot(fin_shap_values, fin_explain, index_names)
