@@ -52,7 +52,7 @@ For SEED, please load the above model file stored in the `model/seed` folder and
 ```
 shapdatashow/shap_explain_mean.py
 ```
-The raw feature maps and SHAP maps (Subjects 8 and 9 in the SEED dataset and subjects 1 and 18 in the DREAMER dataset) that were run through the above files were saved in the `shapdatashow` file. 
+The raw feature maps and SHAP maps (Subjects 8 and 9 in the SEED dataset, subjects 1 and 18 in the DREAMER dataset) that were run through the above files were saved in the `shapdatashow` file. 
 
 
 ## Results
